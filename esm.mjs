@@ -51,6 +51,7 @@ export const {
   SequentialBucket,
   Shard,
   SharedStream,
+  SoundboardSound,
   StageChannel,
   StageInstance,
   TextChannel,

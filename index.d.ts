@@ -818,6 +818,7 @@ declare namespace Eris {
     avatar: string | null;
     avatarDecorationData?: AvatarDecorationData | null;
     communicationDisabledUntil?: number | null;
+    flags?: number;
     nick: string | null;
     pending?: boolean;
     premiumSince?: number | null;

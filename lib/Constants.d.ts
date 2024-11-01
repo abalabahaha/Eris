@@ -452,6 +452,8 @@ export default interface Constants {
     // Unknown 30
     STAGE_TOPIC:                                  31;
     GUILD_APPLICATION_PREMIUM_SUBSCRIPTION:       32;
+    // Unknown 33-43
+    PURCHASE_NOTIFICATION:                        44;
   };
   MessageReferenceTypes: {
     DEFAULT: 0;

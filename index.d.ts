@@ -689,6 +689,14 @@ declare namespace Eris {
     url?: string;
     width?: number;
   }
+  interface PollEmbed {
+    fields: PollEmbedField[];
+    type: "poll_result";
+  }
+  interface PollEmbedField extends EmbedField {
+    /** Only `poll_question_text`, `victor_answer_votes` and `total_votes` are guaranteed. Other names are optional and may not be present. */
+    name: "poll_question_text" | "victor_answer_votes" | "total_votes" | "victor_answer_id" | "victor_answer_text" | "victor_answer_emoji_id" | "victor_answer_emoji_name" | "victor_answer_emoji_animated"; // REVIEW Is there a better way to do this?
+  }
 
   // Emoji
   interface Emoji extends EmojiBase {
@@ -3084,7 +3092,7 @@ declare namespace Eris {
     content: string;
     createdAt: number;
     editedTimestamp?: number;
-    embeds: Embed[];
+    embeds: Embed[] | [PollEmbed];
     flags: number;
     guildID: T extends GuildTextableWithThreads ? string : undefined;
     id: string;

@@ -2351,6 +2351,7 @@ declare namespace Eris {
     getSelf(): Promise<ExtendedUser>;
     getSoundboardSounds(): Promise<SoundboardSound<false>[]>;
     getStageInstance(channelID: string): Promise<StageInstance>;
+    getStickerPack(packID: string): Promise<StickerPack>;
     getThreadMember(channelID: string, userID: string, withMember?: boolean): Promise<ThreadMember>;
     getThreadMembers(channelID: string, options?: GetThreadMembersOptions): Promise<ThreadMember[]>;
     getVoiceRegions(guildID?: string): Promise<VoiceRegion[]>;

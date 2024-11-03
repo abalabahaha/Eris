@@ -1273,7 +1273,6 @@ declare namespace Eris {
     icon: string | null;
     id: string;
     name: string;
-    summary: ""; // Returns an empty string
   }
   interface IntegrationOptions {
     enableEmoticons?: string;
@@ -1692,8 +1691,6 @@ declare namespace Eris {
     type: "user" | "role" | "channel";
   }
   interface Sticker extends StickerItems {
-    /** @deprecated */
-    asset: "";
     available?: boolean;
     description: string;
     guild_id?: string;
@@ -2002,8 +1999,6 @@ declare namespace Eris {
     privacy_policy_url?: string;
     role_connections_verification_url?: string;
     rpc_origins?: string[];
-    /** @deprecated */
-    summary: "";
     team: OAuthTeamInfo | null;
     terms_of_service_url?: string;
     verify_key: string;

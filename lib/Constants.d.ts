@@ -655,6 +655,11 @@ export default interface Constants {
     "Good to see you, %user%.",
     "Yay you made it, %user%!",
   ];
+  SubscriptionStatuses: {
+    ACTIVE:   0;
+    ENDING:   1;
+    INACTIVE: 2;
+  };
   ThreadMemberFlags: {
     HAS_INTERACTED: 1;
     ALL_MESSAGES:   2;

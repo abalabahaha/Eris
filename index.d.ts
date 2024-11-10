@@ -207,6 +207,7 @@ declare namespace Eris {
    type EntitlementOwnerTypes = Constants["EntitlementOwnerTypes"][keyof Constants["EntitlementOwnerTypes"]];
    type SKUTypes = Constants["SKUTypes"][keyof Constants["SKUTypes"]];
    type SKUFlags = Constants["SKUFlags"][keyof Constants["SKUFlags"]];
+   type SubscriptionStatuses = Constants["SubscriptionStatuses"][keyof Constants["SubscriptionStatuses"]];
 
   // INTERFACES
   // Internals
@@ -973,6 +974,9 @@ declare namespace Eris {
     entitlementCreate: [entitlement: Entitlement];
     entitlementUpdate: [entitlement: Entitlement];
     entitlementDelete: [entitlement: Entitlement];
+    subscriptionCreate: [subscription: Subscription];
+    subscriptionDelete: [subscription: Subscription];
+    subscriptionUpdate: [subscription: Subscription];
   }
   interface ClientEvents extends EventListeners {
     shardDisconnect: [err: Error | undefined, id: number];
@@ -1364,6 +1368,13 @@ declare namespace Eris {
     limit?: number;
     guildID?: string;
     excludeEnded?: boolean;
+  }
+
+  interface GetSKUSubscriptionsOptions {
+    userID: string;
+    before?: number;
+    after?: number;
+    limit?: number;
   }
 
   // Interaction
@@ -2386,6 +2397,10 @@ declare namespace Eris {
     getRoleConnectionMetadataRecords(): Promise<ApplicationRoleConnectionMetadata[]>;
     getSelf(): Promise<ExtendedUser>;
     getSKUs(): Promise<SKU[]>;
+    getSKUSubscription(skuID: string, subscriptionID: string): Promise<Subscription>;
+
+    getSKUSubscriptions(skuID: string, options: GetSKUSubscriptionsOptions): Promise<Subscription[]>;
+
     getSoundboardSounds(): Promise<SoundboardSound<false>[]>;
     getStageInstance(channelID: string): Promise<StageInstance>;
 
@@ -2585,6 +2600,21 @@ declare namespace Eris {
     type: SKUTypes;
     createTestEntitlement(ownerID: string, ownerType: EntitlementOwnerTypes): Promise<Entitlement>;
     getEntitlements(options?: Omit<GetEntitlementsOptions, "skuIDs">): Promise<Entitlement[]>;
+    getSKUSubscription(subscriptionID: string): Promise<Subscription>;
+    getSKUSubscriptions(): Promise<Subscription[]>;
+  }
+
+  export class Subscription extends Base {
+    canceledAt: number | null;
+    country?: string;
+    currentPeriodEnd: number;
+
+    currentPeriodStart: number;
+
+    entitlementIDs: string[];
+    skuIDs: string[];
+    status: SubscriptionStatuses;
+    userID: string;
   }
 
   export class ExtendedUser extends User {

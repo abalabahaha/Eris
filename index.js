@@ -50,6 +50,7 @@ Eris.PublicThreadChannel = require("./lib/structures/PublicThreadChannel");
 Eris.RequestHandler = require("./lib/rest/RequestHandler");
 Eris.Role = require("./lib/structures/Role");
 Eris.SKU = require("./lib/structures/SKU");
+Eris.Subscription = require("./lib/structures/Subscription");
 Eris.SequentialBucket = require("./lib/util/SequentialBucket");
 Eris.Shard = require("./lib/gateway/Shard");
 Eris.SharedStream = require("./lib/voice/SharedStream");

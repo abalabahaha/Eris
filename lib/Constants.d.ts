@@ -608,10 +608,8 @@ export default interface Constants {
     BURST:  1;
   };
   SKUTypes: {
-    DURABLE_PRIMARY:    1;
     DURABLE:            2;
     CONSUMABLE:         3;
-    BUNDLE:             4;
     SUBSCRIPTION:       5;
     SUBSCRIPTION_GROUP: 6;
   };

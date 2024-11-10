@@ -1309,6 +1309,10 @@ declare namespace Eris {
     target_id?: string;
     options: InteractionDataOptions[];
   }
+  interface AuthorizingIntegrationOwners {
+    guildInstall?: string;
+    userInstall: string;
+  }
   interface CommandInteractionData {
     id: string;
     name: string;
@@ -2834,6 +2838,7 @@ declare namespace Eris {
   export class Interaction extends Base {
     acknowledged: boolean;
     applicationID: string;
+    authorizingIntegrationOwners: AuthorizingIntegrationOwners;
     id: string;
     token: string;
     type: number;

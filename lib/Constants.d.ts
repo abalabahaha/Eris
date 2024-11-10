@@ -560,6 +560,7 @@ export default interface Constants {
     allText:                          633854226857041n;
     allVoice:                         954930478188305n;
     all:                              985162418487295n;
+    useExternalApps:                  1125899906842624n;
   };
   PollLayoutTypes: {
     DEFAULT: 1;

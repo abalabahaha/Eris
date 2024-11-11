@@ -2003,6 +2003,7 @@ declare namespace Eris {
     bot?: PartialUser;
     bot_public: boolean;
     bot_require_code_grant: boolean;
+    custom_install_url?: string;
     description: string;
     icon: string | null;
     id: string;
@@ -2010,6 +2011,10 @@ declare namespace Eris {
       0?: OAuthApplicationIntegrationTypeConfiguration;
       1?: OAuthApplicationIntegrationTypeConfiguration;
     }; // TODO: Configure types for this properly
+    install_params?: {
+      scopes: string[],
+      permissions: string
+    }
     name: string;
     owner: PartialUser;
     privacy_policy_url?: string;

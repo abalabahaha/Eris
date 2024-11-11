@@ -8,7 +8,6 @@ const bot = new Eris.Client("Bot token", {
 
 bot.on("ready", async () => {
   console.log("connected!");
-  console.log((await bot.getOAuthApplication()).integration_types_config);
   bot.createCommand({
     type: Constants.ApplicationCommandTypes.CHAT_INPUT,
     name: "ping",

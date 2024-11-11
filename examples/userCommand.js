@@ -2,12 +2,13 @@ const Eris = require("eris");
 
 const Constants = Eris.Constants;
 
-const bot = new Eris("Bot token", {
+const bot = new Eris.Client("Bot token", {
   intents: [],
 });
 
-bot.on("ready", () => {
+bot.on("ready", async () => {
   console.log("connected!");
+  console.log((await bot.getOAuthApplication()).integration_types_config);
   bot.createCommand({
     type: Constants.ApplicationCommandTypes.CHAT_INPUT,
     name: "ping",

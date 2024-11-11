@@ -2006,6 +2006,10 @@ declare namespace Eris {
     description: string;
     icon: string | null;
     id: string;
+    integration_types_config: {
+      0?: OAuthApplicationIntegrationTypeConfiguration;
+      1?: OAuthApplicationIntegrationTypeConfiguration;
+    }; // TODO: Configure types for this properly
     name: string;
     owner: PartialUser;
     privacy_policy_url?: string;
@@ -2016,6 +2020,12 @@ declare namespace Eris {
     team: OAuthTeamInfo | null;
     terms_of_service_url?: string;
     verify_key: string;
+  }
+  interface OAuthApplicationIntegrationTypeConfiguration {
+    oauth2_install_params?: {
+      scopes: string[];
+      permissions: string;
+    };
   }
   interface OAuthTeamInfo {
     icon: string | null;

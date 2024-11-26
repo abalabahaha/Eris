@@ -75,8 +75,8 @@ bot.on("messageCreate", (msg) => { // When a message is created
               default_values: [ // List of default values for auto-populated select menus https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-default-value-structure
                 {
                   id: "[Insert default channel id here]",
-                  type: "channel"
-                }
+                  type: "channel",
+                },
               ],
               min_values: 1,
               max_values: 1,

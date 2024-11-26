@@ -13,6 +13,8 @@ export default interface Constants {
     EMBEDDED:                    256;
   };
   ActivityTypes: {
+    PLAYING:   0;
+    /** @deprecated */
     GAME:      0;
     STREAMING: 1;
     LISTENING: 2;
@@ -402,7 +404,7 @@ export default interface Constants {
     STARTED_HOME_ACTIONS:            32;
     COMPLETED_HOME_ACTIONS:          64;
     AUTOMOD_QUARANTINED_USERNAME:    128;
-    // Unknown 1 << 18 (256)
+    // Unknown 1 << 8 (256)
     DM_SETTINGS_UPSELL_ACKNOWLEDGED: 512;
   };
   MessageActivityTypes: {
@@ -468,6 +470,10 @@ export default interface Constants {
     GUILD_INCIDENT_ALERT_MODE_DISABLED:           37;
     GUILD_INCIDENT_REPORT_RAID:                   38;
     GUILD_INCIDENT_REPORT_FALSE_ALARM:            39;
+    // Unknown 40-43
+    PURCHASE_NOTIFICATION:                        44;
+    // Unknown 45
+    POLL_RESULT:                                  46;
   };
   MessageReferenceTypes: {
     DEFAULT: 0;
@@ -572,10 +578,11 @@ export default interface Constants {
     sendVoiceMessages:                70368744177664n;
     setVoiceChannelStatus:            281474976710656n;
     sendPolls:                        562949953421312n;
-    allGuild:                         29697484783806n;
-    allText:                          633854226857041n;
-    allVoice:                         954930478188305n;
-    all:                              985162418487295n;
+    useExternalApps:                  1125899906842624n;
+    allGuild:                         1155597391626430n;
+    allText:                          1759754133699665n;
+    allVoice:                         2080830385030929n;
+    all:                              2111062325329919n;
   };
   PollLayoutTypes: {
     DEFAULT: 1;

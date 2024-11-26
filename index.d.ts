@@ -134,7 +134,7 @@ declare namespace Eris {
   type AnyInteraction = PingInteraction | CommandInteraction | ComponentInteraction | AutocompleteInteraction | ModalSubmitInteraction;
   type InteractionCallbackData = InteractionAutocomplete | InteractionContent | InteractionModal;
   type InteractionContent = Pick<WebhookPayload, "content" | "embeds" | "allowedMentions" | "tts" | "flags" | "components" | "poll">;
-  type InteractionContentEdit = Pick<WebhookPayload, "content" | "embeds" | "allowedMentions" | "components">;
+  type InteractionContentEdit = Pick<WebhookPayload, "content" | "embeds" | "allowedMentions" | "components" | "poll">;
   type InteractionDataOptions = InteractionDataOptionsSubCommand | InteractionDataOptionsSubCommandGroup | InteractionDataOptionsWithValue;
   type InteractionDataOptionsBoolean = InteractionDataOptionWithValue<Constants["ApplicationCommandOptionTypes"]["BOOLEAN"], boolean>;
   type InteractionDataOptionsChannel = InteractionDataOptionWithValue<Constants["ApplicationCommandOptionTypes"]["CHANNEL"], string>;
@@ -689,6 +689,14 @@ declare namespace Eris {
     url?: string;
     width?: number;
   }
+  interface PollEmbed {
+    fields: PollEmbedField[];
+    type: "poll_result";
+  }
+  interface PollEmbedField extends EmbedField {
+    /** Only `poll_question_text`, `victor_answer_votes` and `total_votes` are guaranteed. Other names are optional and may not be present. */
+    name: "poll_question_text" | "victor_answer_votes" | "total_votes" | "victor_answer_id" | "victor_answer_text" | "victor_answer_emoji_id" | "victor_answer_emoji_name" | "victor_answer_emoji_animated"; // REVIEW Is there a better way to do this?
+  }
 
   // Emoji
   interface Emoji extends EmojiBase {
@@ -818,6 +826,7 @@ declare namespace Eris {
     avatar: string | null;
     avatarDecorationData?: AvatarDecorationData | null;
     communicationDisabledUntil?: number | null;
+    flags?: number;
     nick: string | null;
     pending?: boolean;
     premiumSince?: number | null;
@@ -1272,7 +1281,6 @@ declare namespace Eris {
     icon: string | null;
     id: string;
     name: string;
-    summary: ""; // Returns an empty string
   }
   interface IntegrationOptions {
     enableEmoticons?: string;
@@ -1584,6 +1592,10 @@ declare namespace Eris {
     id: string;
     name: string;
   }
+  interface MessageCall {
+    endedTimestamp: number | null;
+    participants: string[];
+  }
   interface MessageInteraction {
     id: string;
     member: Member | null;
@@ -1691,8 +1703,6 @@ declare namespace Eris {
     type: "user" | "role" | "channel";
   }
   interface Sticker extends StickerItems {
-    /** @deprecated */
-    asset: "";
     available?: boolean;
     description: string;
     guild_id?: string;
@@ -2001,8 +2011,6 @@ declare namespace Eris {
     privacy_policy_url?: string;
     role_connections_verification_url?: string;
     rpc_origins?: string[];
-    /** @deprecated */
-    summary: "";
     team: OAuthTeamInfo | null;
     terms_of_service_url?: string;
     verify_key: string;
@@ -2308,6 +2316,7 @@ declare namespace Eris {
     getGuildTemplate(code: string): Promise<GuildTemplate>;
     getGuildTemplates(guildID: string): Promise<GuildTemplate[]>;
     getGuildVanity(guildID: string): Promise<GuildVanity>;
+    getGuildVoiceState(guildID: string, userID: string): Promise<VoiceState>;
     getGuildWebhooks(guildID: string): Promise<Webhook[]>;
     getGuildWelcomeScreen(guildID: string): Promise<WelcomeScreen>;
     getGuildWidget(guildID: string): Promise<WidgetData>;
@@ -2337,6 +2346,7 @@ declare namespace Eris {
     getRESTGuildMembers(guildID: string, options?: GetRESTGuildMembersOptions): Promise<Member[]>;
     /** @deprecated */
     getRESTGuildMembers(guildID: string, limit?: number, after?: string): Promise<Member[]>;
+    getRESTGuildRole(guildID: string, roleID: string): Promise<Role>;
     getRESTGuildRoles(guildID: string): Promise<Role[]>;
     getRESTGuilds(options?: GetRESTGuildsOptions): Promise<Guild[]>;
     /** @deprecated */
@@ -2350,6 +2360,7 @@ declare namespace Eris {
     getSelf(): Promise<ExtendedUser>;
     getSoundboardSounds(): Promise<SoundboardSound<false>[]>;
     getStageInstance(channelID: string): Promise<StageInstance>;
+    getStickerPack(packID: string): Promise<StickerPack>;
     getThreadMember(channelID: string, userID: string, withMember?: boolean): Promise<ThreadMember>;
     getThreadMembers(channelID: string, options?: GetThreadMembersOptions): Promise<ThreadMember[]>;
     getVoiceRegions(guildID?: string): Promise<VoiceRegion[]>;
@@ -2702,6 +2713,7 @@ declare namespace Eris {
     getRESTMembers(options?: GetRESTGuildMembersOptions): Promise<Member[]>;
     /** @deprecated */
     getRESTMembers(limit?: number, after?: string): Promise<Member[]>;
+    getRESTRole(roleID: string): Promise<Role>;
     getRESTRoles(): Promise<Role[]>;
     getRESTScheduledEvent(eventID: string): Promise<GuildScheduledEvent>;
     getRESTSticker(stickerID: string): Promise<Sticker>;
@@ -2713,6 +2725,7 @@ declare namespace Eris {
     getTemplates(): Promise<GuildTemplate[]>;
     getVanity(): Promise<GuildVanity>;
     getVoiceRegions(): Promise<VoiceRegion[]>;
+    getVoiceState(userID: string): Promise<VoiceState>;
     getWebhooks(): Promise<Webhook[]>;
     getWelcomeScreen(): Promise<WelcomeScreen>;
     getWidget(): Promise<WidgetData>;
@@ -2965,7 +2978,7 @@ declare namespace Eris {
     deleteOriginalMessage(): Promise<void>;
     editMessage(messageID: string, content: string | InteractionContentEdit, file?: FileContent | FileContent[]): Promise<Message<T>>;
     editOriginalMessage(content: string | InteractionContentEdit, file?: FileContent | FileContent[]): Promise<Message<T>>;
-    editParent(content: InteractionContentEdit, file?: FileContent | FileContent[]): Promise<void>;
+    editParent(content: Omit<InteractionContentEdit, "poll">, file?: FileContent | FileContent[]): Promise<void>;
     getOriginalMessage(): Promise<Message<T>>;
   }
 
@@ -2987,7 +3000,7 @@ declare namespace Eris {
     deleteOriginalMessage(): Promise<void>;
     editMessage(messageID: string, content: string | InteractionContentEdit, file?: FileContent | FileContent[]): Promise<Message<T>>;
     editOriginalMessage(content: string | InteractionContentEdit, file?: FileContent | FileContent[]): Promise<Message<T>>;
-    editParent(content: InteractionContentEdit, file?: FileContent | FileContent[]): Promise<void>;
+    editParent(content: Omit<InteractionContentEdit, "poll">, file?: FileContent | FileContent[]): Promise<void>;
     getOriginalMessage(): Promise<Message<T>>;
     pong(): Promise<void>;
     result(choices: ApplicationCommandOptionChoice[]): Promise<void>;
@@ -3074,6 +3087,7 @@ declare namespace Eris {
     applicationID?: string;
     attachments: Attachment[];
     author: User;
+    call?: MessageCall;
     channel: T;
     channelMentions: string[];
     /** @deprecated */
@@ -3083,7 +3097,7 @@ declare namespace Eris {
     content: string;
     createdAt: number;
     editedTimestamp?: number;
-    embeds: Embed[];
+    embeds: Embed[] | [PollEmbed];
     flags: number;
     guildID: T extends GuildTextableWithThreads ? string : undefined;
     id: string;
@@ -3142,7 +3156,7 @@ declare namespace Eris {
     deleteOriginalMessage(): Promise<void>;
     editMessage(messageID: string, content: string | InteractionContentEdit, file?: FileContent | FileContent[]): Promise<Message>;
     editOriginalMessage(content: string | InteractionContentEdit, file?: FileContent | FileContent[]): Promise<Message>;
-    editParent(content: InteractionContentEdit, file?: FileContent | FileContent[]): Promise<void>;
+    editParent(content: Omit<InteractionContentEdit, "poll">, file?: FileContent | FileContent[]): Promise<void>;
     getOriginalMessage(): Promise<Message>;
   }
 

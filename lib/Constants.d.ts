@@ -389,10 +389,16 @@ export default interface Constants {
     CHINESE_TAIWAN:       "zh-TW";
   };
   MemberFlags: {
-    DID_REJOIN:            1;
-    COMPLETED_ONBOARDING:  2;
-    BYPASSES_VERIFICATION: 4;
-    STARTED_ONBOARDING:    8;
+    DID_REJOIN:                      1;
+    COMPLETED_ONBOARDING:            2;
+    BYPASSES_VERIFICATION:           4;
+    STARTED_ONBOARDING:              8;
+    IS_GUEST:                        16;
+    STARTED_HOME_ACTIONS:            32;
+    COMPLETED_HOME_ACTIONS:          64;
+    AUTOMOD_QUARANTINED_USERNAME:    128;
+    // Unknown 1 << 8 (256)
+    DM_SETTINGS_UPSELL_ACKNOWLEDGED: 512;
   };
   MessageActivityTypes: {
     JOIN:         1;
@@ -454,6 +460,8 @@ export default interface Constants {
     GUILD_APPLICATION_PREMIUM_SUBSCRIPTION:       32;
     // Unknown 33-43
     PURCHASE_NOTIFICATION:                        44;
+    // Unknown 45
+    POLL_RESULT:                                  46;
   };
   MessageReferenceTypes: {
     DEFAULT: 0;

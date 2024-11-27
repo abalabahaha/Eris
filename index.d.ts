@@ -47,7 +47,6 @@ declare namespace Eris {
   type AutoModerationEventType = Constants["AutoModerationEventTypes"][keyof Constants["AutoModerationEventTypes"]];
   type AutoModerationKeywordPresetType = Constants["AutoModerationKeywordPresetTypes"][keyof Constants["AutoModerationKeywordPresetTypes"]];
   type AutoModerationTriggerType = Constants["AutoModerationTriggerTypes"][keyof Constants["AutoModerationTriggerTypes"]];
-  type EditAutoModerationRuleOptions = Partial<CreateAutoModerationRuleOptions>;
 
   // Cache
   interface Uncached { id: string }
@@ -134,7 +133,7 @@ declare namespace Eris {
   type AnyInteraction = PingInteraction | CommandInteraction | ComponentInteraction | AutocompleteInteraction | ModalSubmitInteraction;
   type InteractionCallbackData = InteractionAutocomplete | InteractionContent | InteractionModal;
   type InteractionContent = Pick<WebhookPayload, "content" | "embeds" | "allowedMentions" | "tts" | "flags" | "components" | "poll">;
-  type InteractionContentEdit = Pick<WebhookPayload, "content" | "embeds" | "allowedMentions" | "components">;
+  type InteractionContentEdit = Pick<WebhookPayload, "content" | "embeds" | "allowedMentions" | "components" | "poll">;
   type InteractionDataOptions = InteractionDataOptionsSubCommand | InteractionDataOptionsSubCommandGroup | InteractionDataOptionsWithValue;
   type InteractionDataOptionsBoolean = InteractionDataOptionWithValue<Constants["ApplicationCommandOptionTypes"]["BOOLEAN"], boolean>;
   type InteractionDataOptionsChannel = InteractionDataOptionWithValue<Constants["ApplicationCommandOptionTypes"]["CHANNEL"], string>;
@@ -191,6 +190,7 @@ declare namespace Eris {
   type SortOrderTypes = Constants["SortOrderTypes"][keyof Constants["SortOrderTypes"]];
 
   // User
+  type PossiblyUncachedUser = User | Uncached;
   type PremiumTypes = Constants["PremiumTypes"][keyof Constants["PremiumTypes"]];
 
   // Voice
@@ -319,9 +319,9 @@ declare namespace Eris {
   }
 
   // Auto Moderation
-  interface AutoModerationAction {
-    metadata?: AutoModerationActionMetadata;
-    type: AutoModerationActionType;
+  interface AutoModerationAction<T = AutoModerationActionType> {
+    metadata: T extends Constants["AutoModerationActionTypes"]["BLOCK_MEMBER_INTERACTION"] ? never : AutoModerationActionMetadata<T>;
+    type: T;
   }
   interface AutoModerationActionExecution {
     action: AutoModerationAction;
@@ -336,42 +336,35 @@ declare namespace Eris {
     ruleTriggerType: AutoModerationTriggerType;
     userID: string;
   }
-  interface AutoModerationActionMetadata {
-    /** valid for SEND_ALERT_MESSAGE */
-    channelID?: string;
-    /** valid for TIMEOUT */
-    durationSeconds?: number;
+  interface AutoModerationActionMetadata<T = AutoModerationActionType> {
+    channelID: T extends Constants["AutoModerationActionTypes"]["SEND_ALERT_MESSAGE"] ? string : never;
+    customMessage: T extends Constants["AutoModerationActionTypes"]["BLOCK_MESSAGE"] ? string : never;
+    durationSeconds: T extends Constants["AutoModerationActionTypes"]["TIMEOUT"] ? number : never;
   }
-  interface AutoModerationRule {
+  interface AutoModerationCreateOptions<T = AutoModerationTriggerType> {
     actions: AutoModerationAction[];
-    creatorID: string;
-    enabled: boolean;
     eventType: AutoModerationEventType;
-    exemptRoles: string[];
-    exemptUsers: string[];
-    guildID: string;
-    id: string;
     name: string;
-    triggerMetadata: AutoModerationTriggerMetadata;
-    triggerType: AutoModerationTriggerType;
+    triggerMetadata: T extends Constants["AutoModerationTriggerTypes"]["SPAM"] ? never : AutoModerationTriggerMetadata<T>;
+    triggerType: T;
   }
-  interface CreateAutoModerationRuleOptions {
-    actions: AutoModerationAction[];
+  interface AutoModerationEditOptions<T extends AutoModerationTriggerType> {
+    actions?: AutoModerationAction[];
     enabled?: boolean;
-    eventType: AutoModerationActionType;
+    eventType?: AutoModerationEventType;
     exemptChannels?: string[];
     exemptRoles?: string[];
-    name: string;
+    name?: string;
     reason?: string;
-    triggerMetadata?: AutoModerationTriggerMetadata;
-    triggerType: AutoModerationTriggerType;
+    triggerMetadata: T extends Constants["AutoModerationTriggerTypes"]["SPAM"] ? never : AutoModerationTriggerMetadata<T> | undefined;
   }
-
-  interface AutoModerationTriggerMetadata {
-    /** valid for KEYWORD */
-    keywordFilter: string[];
-    /** valid for KEYWORD_PRESET */
-    presets: AutoModerationKeywordPresetType[];
+  interface AutoModerationTriggerMetadata<T = AutoModerationTriggerType> {
+    allowList: T extends Constants["AutoModerationTriggerTypes"]["KEYWORD" | "KEYWORD_PRESET" | "MEMBER_PROFILE"] ? string[] : never;
+    keywordFilter: T extends Constants["AutoModerationTriggerTypes"]["KEYWORD" | "MEMBER_PROFILE"] ? string[] : never;
+    mentionRaidProtectionEnabled: T extends Constants["AutoModerationTriggerTypes"]["MENTION_SPAM"] ? boolean : never;
+    mentionTotalLimit: T extends Constants["AutoModerationTriggerTypes"]["MENTION_SPAM"] ? number : never;
+    presets: T extends Constants["AutoModerationTriggerTypes"]["KEYWORD_PRESET"] ? AutoModerationKeywordPresetType[] : never;
+    regexPatterns: T extends Constants["AutoModerationTriggerTypes"]["KEYWORD" | "MEMBER_PROFILE"] ? string[] : never;
   }
 
   // Channel
@@ -689,6 +682,14 @@ declare namespace Eris {
     url?: string;
     width?: number;
   }
+  interface PollEmbed {
+    fields: PollEmbedField[];
+    type: "poll_result";
+  }
+  interface PollEmbedField extends EmbedField {
+    /** Only `poll_question_text`, `victor_answer_votes` and `total_votes` are guaranteed. Other names are optional and may not be present. */
+    name: "poll_question_text" | "victor_answer_votes" | "total_votes" | "victor_answer_id" | "victor_answer_text" | "victor_answer_emoji_id" | "victor_answer_emoji_name" | "victor_answer_emoji_animated"; // REVIEW Is there a better way to do this?
+  }
 
   // Emoji
   interface Emoji extends EmojiBase {
@@ -724,6 +725,15 @@ declare namespace Eris {
   }
 
   // Events
+  interface OldAutoModerationRule {
+    actions: AutoModerationAction[];
+    enabled: boolean;
+    eventType: AutoModerationEventType;
+    exemptChannels: string[];
+    exemptRoles: string[];
+    name: string;
+    triggerMetadata: AutoModerationTriggerMetadata;
+  }
   interface OldCall {
     endedTimestamp?: number;
     participants: string[];
@@ -827,6 +837,7 @@ declare namespace Eris {
     avatar: string | null;
     avatarDecorationData?: AvatarDecorationData | null;
     communicationDisabledUntil?: number | null;
+    flags?: number;
     nick: string | null;
     pending?: boolean;
     premiumSince?: number | null;
@@ -893,7 +904,7 @@ declare namespace Eris {
     autoModerationActionExecution: [guild: Guild, action: AutoModerationActionExecution];
     autoModerationRuleCreate: [guild: Guild, rule: AutoModerationRule];
     autoModerationRuleDelete: [guild: Guild, rule: AutoModerationRule];
-    autoModerationRuleUpdate: [guild: Guild, rule: AutoModerationRule | null, newRule: AutoModerationRule];
+    autoModerationRuleUpdate: [guild: Guild, rule: AutoModerationRule, oldRule: OldAutoModerationRule | null];
     channelCreate: [channel: AnyGuildChannel];
     channelDelete: [channel: Exclude<AnyChannel, GroupChannel>];
     channelPinUpdate: [channel: TextableChannel, timestamp: number, oldTimestamp: number];
@@ -921,8 +932,8 @@ declare namespace Eris {
     guildScheduledEventCreate: [event: GuildScheduledEvent];
     guildScheduledEventDelete: [event: GuildScheduledEvent];
     guildScheduledEventUpdate: [event: GuildScheduledEvent, oldEvent: OldGuildScheduledEvent | null];
-    guildScheduledEventUserAdd: [event: PossiblyUncachedGuildScheduledEvent, user: User | Uncached];
-    guildScheduledEventUserRemove: [event: PossiblyUncachedGuildScheduledEvent, user: User | Uncached];
+    guildScheduledEventUserAdd: [event: PossiblyUncachedGuildScheduledEvent, user: PossiblyUncachedUser];
+    guildScheduledEventUserRemove: [event: PossiblyUncachedGuildScheduledEvent, user: PossiblyUncachedUser];
     guildSoundboardSoundCreate: [sound: SoundboardSound];
     guildSoundboardSoundDelete: [sound: PossiblyUncachedGuildSoundboardSound];
     guildSoundboardSoundUpdate: [sound: SoundboardSound, oldSound: OldGuildSoundboardSound | null];
@@ -937,8 +948,8 @@ declare namespace Eris {
     messageCreate: [message: Message<PossiblyUncachedTextableChannel>];
     messageDelete: [message: PossiblyUncachedMessage];
     messageDeleteBulk: [messages: PossiblyUncachedMessage[]];
-    messagePollVoteAdd: [message: PossiblyUncachedMessage, user: User | Uncached, answerID: number];
-    messagePollVoteRemove: [message: PossiblyUncachedMessage, user: User | Uncached, answerID: number];
+    messagePollVoteAdd: [message: PossiblyUncachedMessage, user: PossiblyUncachedUser, answerID: number];
+    messagePollVoteRemove: [message: PossiblyUncachedMessage, user: PossiblyUncachedUser, answerID: number];
     messageReactionAdd: [message: PossiblyUncachedMessage, emoji: PartialEmoji, reactor: Member | Uncached, burst: boolean];
     messageReactionRemove: [message: PossiblyUncachedMessage, emoji: PartialEmoji, userID: string, burst: boolean];
     messageReactionRemoveAll: [message: PossiblyUncachedMessage];
@@ -959,8 +970,8 @@ declare namespace Eris {
     threadMembersUpdate: [channel: AnyThreadChannel, addedMembers: ThreadMember[], removedMembers: (ThreadMember | Uncached)[]];
     threadMemberUpdate: [channel: AnyThreadChannel, member: ThreadMember, oldMember: OldThreadMember];
     threadUpdate: [channel: AnyThreadChannel, oldChannel: OldThread | null];
-    typingStart: [channel: AnyGuildTextableChannel | Uncached, user: User | Uncached, member: Member]
-      | [channel: DMChannel | Uncached, user: User | Uncached, member: null];
+    typingStart: [channel: AnyGuildTextableChannel | Uncached, user: PossiblyUncachedUser, member: Member]
+      | [channel: DMChannel | Uncached, user: PossiblyUncachedUser, member: null];
     unavailableGuildCreate: [guild: UnavailableGuild];
     unknown: [packet: RawPacket, id?: number];
     userUpdate: [user: User, oldUser: PartialUser | null];
@@ -1281,7 +1292,6 @@ declare namespace Eris {
     icon: string | null;
     id: string;
     name: string;
-    summary: ""; // Returns an empty string
   }
   interface IntegrationOptions {
     enableEmoticons?: string;
@@ -1593,6 +1603,10 @@ declare namespace Eris {
     id: string;
     name: string;
   }
+  interface MessageCall {
+    endedTimestamp: number | null;
+    participants: string[];
+  }
   interface MessageInteraction {
     id: string;
     member: Member | null;
@@ -1621,7 +1635,7 @@ declare namespace Eris {
   }
   interface MessageSnapshot {
     guildID?: string;
-    message: Pick<Message, "attachments" | "content" | "editedTimestamp" | "embeds" | "flags" | "id" | "mentions" | "roleMentions" | "timestamp" | "type">;
+    message: Pick<Message, "attachments" | "components" | "content" | "editedTimestamp" | "embeds" | "flags" | "id" | "mentions" | "roleMentions" | "stickerItems" | "stickers" | "timestamp" | "type">;
   }
   interface PartialAttachment {
     description?: string;
@@ -1700,8 +1714,6 @@ declare namespace Eris {
     type: "user" | "role" | "channel";
   }
   interface Sticker extends StickerItems {
-    /** @deprecated */
-    asset: "";
     available?: boolean;
     description: string;
     guild_id?: string;
@@ -1908,7 +1920,7 @@ declare namespace Eris {
     guild: PossiblyUncachedGuild;
     soundID?: string | number;
     soundVolume?: number;
-    user: User | Uncached;
+    user: PossiblyUncachedUser;
   }
   interface VoiceConnectData {
     channel_id: string;
@@ -2010,8 +2022,6 @@ declare namespace Eris {
     privacy_policy_url?: string;
     role_connections_verification_url?: string;
     rpc_origins?: string[];
-    /** @deprecated */
-    summary: "";
     team: OAuthTeamInfo | null;
     terms_of_service_url?: string;
     verify_key: string;
@@ -2031,6 +2041,21 @@ declare namespace Eris {
   }
 
   // Classes
+  export class AutoModerationRule<T extends AutoModerationTriggerType = AutoModerationTriggerType> extends Base {
+    actions: AutoModerationAction[];
+    creator: PossiblyUncachedUser;
+    enabled: boolean;
+    eventType: AutoModerationEventType;
+    exemptChannels: string[];
+    exemptRoles: string[];
+    guild: PossiblyUncachedGuild;
+    name: string;
+    triggerMetadata: AutoModerationTriggerMetadata<T>;
+    triggerType: T;
+    constructor(data: BaseData, client: Client);
+    delete(reason?: string): Promise<void>;
+    edit(options: AutoModerationEditOptions<T>): Promise<AutoModerationRule<T>>;
+  }
   /** Generic T is `true` if a Guild scoped command, and `false` if not */
   export class ApplicationCommand<T extends boolean, U = ApplicationCommandTypes> extends Base {
     applicationID: string;
@@ -2154,7 +2179,7 @@ declare namespace Eris {
     bulkEditGuildCommands(guildID: string, commands: ApplicationCommandBulkEditOptions<true>[]): Promise<ApplicationCommand<true>[]>;
     closeVoiceConnection(guildID: string): void;
     connect(): Promise<void>;
-    createAutoModerationRule(guildID: string, rule: CreateAutoModerationRuleOptions): Promise<AutoModerationRule>;
+    createAutoModerationRule(guildID: string, rule: AutoModerationCreateOptions): Promise<AutoModerationRule>;
     createChannel(guildID: string, name: string): Promise<TextChannel>;
     createChannel<T extends GuildChannelTypes>(guildID: string, name: string, type: T, options?: CreateChannelOptions): Promise<ChannelTypeConversion<T>>;
     /** @deprecated */
@@ -2213,7 +2238,7 @@ declare namespace Eris {
     deleteWebhookMessage(webhookID: string, token: string, messageID: string): Promise<void>;
     disconnect(options: { reconnect?: boolean | "auto" }): void;
     editAFK(afk: boolean): void;
-    editAutoModerationRule(guildID: string, ruleID: string, options: EditAutoModerationRuleOptions): Promise<AutoModerationRule>;
+    editAutoModerationRule<T extends AutoModerationTriggerType>(guildID: string, ruleID: string, options: AutoModerationEditOptions<T>): Promise<AutoModerationRule>;
     editChannel(
       channelID: string,
       options: EditGuildChannelOptions | EditGroupChannelOptions,
@@ -2322,6 +2347,7 @@ declare namespace Eris {
     getGuildTemplate(code: string): Promise<GuildTemplate>;
     getGuildTemplates(guildID: string): Promise<GuildTemplate[]>;
     getGuildVanity(guildID: string): Promise<GuildVanity>;
+    getGuildVoiceState(guildID: string, userID: string): Promise<VoiceState>;
     getGuildWebhooks(guildID: string): Promise<Webhook[]>;
     getGuildWelcomeScreen(guildID: string): Promise<WelcomeScreen>;
     getGuildWidget(guildID: string): Promise<WidgetData>;
@@ -2351,6 +2377,7 @@ declare namespace Eris {
     getRESTGuildMembers(guildID: string, options?: GetRESTGuildMembersOptions): Promise<Member[]>;
     /** @deprecated */
     getRESTGuildMembers(guildID: string, limit?: number, after?: string): Promise<Member[]>;
+    getRESTGuildRole(guildID: string, roleID: string): Promise<Role>;
     getRESTGuildRoles(guildID: string): Promise<Role[]>;
     getRESTGuilds(options?: GetRESTGuildsOptions): Promise<Guild[]>;
     /** @deprecated */
@@ -2364,6 +2391,7 @@ declare namespace Eris {
     getSelf(): Promise<ExtendedUser>;
     getSoundboardSounds(): Promise<SoundboardSound<false>[]>;
     getStageInstance(channelID: string): Promise<StageInstance>;
+    getStickerPack(packID: string): Promise<StickerPack>;
     getThreadMember(channelID: string, userID: string, withMember?: boolean): Promise<ThreadMember>;
     getThreadMembers(channelID: string, options?: GetThreadMembersOptions): Promise<ThreadMember[]>;
     getVoiceRegions(guildID?: string): Promise<VoiceRegion[]>;
@@ -2640,7 +2668,7 @@ declare namespace Eris {
     banMember(userID: string, deleteMessageDays?: number, reason?: string): Promise<void>;
     bulkBanMembers(options: BulkBanMembersOptions): Promise<BulkBanMembersResponse>;
     bulkEditCommands<T extends ApplicationCommandTypes>(commands: ApplicationCommandBulkEditOptions<true, T>[]): Promise<ApplicationCommand<true, T>[]>;
-    createAutoModerationRule(rule: CreateAutoModerationRuleOptions): Promise<AutoModerationRule>;
+    createAutoModerationRule(rule: AutoModerationCreateOptions): Promise<AutoModerationRule>;
     createChannel(name: string): Promise<TextChannel>;
     createChannel<T extends GuildChannelTypes>(name: string, type: T, options?: CreateChannelOptions): Promise<ChannelTypeConversion<T>>;
     /** @deprecated */
@@ -2669,7 +2697,7 @@ declare namespace Eris {
     dynamicIconURL(format?: ImageFormat, size?: number): string | null;
     dynamicSplashURL(format?: ImageFormat, size?: number): string | null;
     edit(options: GuildOptions, reason?: string): Promise<Guild>;
-    editAutoModerationRule(ruleID: string, options: EditAutoModerationRuleOptions): Promise<AutoModerationRule>;
+    editAutoModerationRule<T extends AutoModerationTriggerType>(ruleID: string, options: AutoModerationEditOptions<T>): Promise<AutoModerationRule>;
     editChannelPositions(channelPositions: ChannelPosition[]): Promise<void>;
     editCommand<T extends ApplicationCommandTypes>(commandID: string, command: ApplicationCommandEditOptions<true, T>): Promise<ApplicationCommand<true, T>>;
     editCommandPermissions(permissions: ApplicationCommandPermissions[], reason?: string): Promise<GuildApplicationCommandPermissions[]>;
@@ -2716,6 +2744,7 @@ declare namespace Eris {
     getRESTMembers(options?: GetRESTGuildMembersOptions): Promise<Member[]>;
     /** @deprecated */
     getRESTMembers(limit?: number, after?: string): Promise<Member[]>;
+    getRESTRole(roleID: string): Promise<Role>;
     getRESTRoles(): Promise<Role[]>;
     getRESTScheduledEvent(eventID: string): Promise<GuildScheduledEvent>;
     getRESTSticker(stickerID: string): Promise<Sticker>;
@@ -2727,6 +2756,7 @@ declare namespace Eris {
     getTemplates(): Promise<GuildTemplate[]>;
     getVanity(): Promise<GuildVanity>;
     getVoiceRegions(): Promise<VoiceRegion[]>;
+    getVoiceState(userID: string): Promise<VoiceState>;
     getWebhooks(): Promise<Webhook[]>;
     getWelcomeScreen(): Promise<WelcomeScreen>;
     getWidget(): Promise<WidgetData>;
@@ -2746,6 +2776,8 @@ declare namespace Eris {
   export class GuildAuditLogEntry extends Base {
     actionType: number;
     after: Record<string, unknown> | null;
+    autoModerationRuleName?: string;
+    autoModerationRuleTriggerType?: AutoModerationTriggerType;
     before: Record<string, unknown> | null;
     channel?: AnyGuildChannel | Uncached;
     count?: number;
@@ -2760,7 +2792,7 @@ declare namespace Eris {
     status?: string;
     target?: Guild | AnyGuildChannel | Member | Role | Invite | Emoji | Sticker | Message<AnyGuildTextableChannel> | null;
     targetID: string;
-    user: User | Uncached;
+    user: PossiblyUncachedUser;
     constructor(data: BaseData, guild: Guild);
   }
 
@@ -2979,7 +3011,7 @@ declare namespace Eris {
     deleteOriginalMessage(): Promise<void>;
     editMessage(messageID: string, content: string | InteractionContentEdit, file?: FileContent | FileContent[]): Promise<Message<T>>;
     editOriginalMessage(content: string | InteractionContentEdit, file?: FileContent | FileContent[]): Promise<Message<T>>;
-    editParent(content: InteractionContentEdit, file?: FileContent | FileContent[]): Promise<void>;
+    editParent(content: Omit<InteractionContentEdit, "poll">, file?: FileContent | FileContent[]): Promise<void>;
     getOriginalMessage(): Promise<Message<T>>;
   }
 
@@ -3001,7 +3033,7 @@ declare namespace Eris {
     deleteOriginalMessage(): Promise<void>;
     editMessage(messageID: string, content: string | InteractionContentEdit, file?: FileContent | FileContent[]): Promise<Message<T>>;
     editOriginalMessage(content: string | InteractionContentEdit, file?: FileContent | FileContent[]): Promise<Message<T>>;
-    editParent(content: InteractionContentEdit, file?: FileContent | FileContent[]): Promise<void>;
+    editParent(content: Omit<InteractionContentEdit, "poll">, file?: FileContent | FileContent[]): Promise<void>;
     getOriginalMessage(): Promise<Message<T>>;
     pong(): Promise<void>;
     result(choices: ApplicationCommandOptionChoice[]): Promise<void>;
@@ -3088,6 +3120,7 @@ declare namespace Eris {
     applicationID?: string;
     attachments: Attachment[];
     author: User;
+    call?: MessageCall;
     channel: T;
     channelMentions: string[];
     /** @deprecated */
@@ -3097,7 +3130,7 @@ declare namespace Eris {
     content: string;
     createdAt: number;
     editedTimestamp?: number;
-    embeds: Embed[];
+    embeds: Embed[] | [PollEmbed];
     flags: number;
     guildID: T extends GuildTextableWithThreads ? string : undefined;
     id: string;
@@ -3156,7 +3189,7 @@ declare namespace Eris {
     deleteOriginalMessage(): Promise<void>;
     editMessage(messageID: string, content: string | InteractionContentEdit, file?: FileContent | FileContent[]): Promise<Message>;
     editOriginalMessage(content: string | InteractionContentEdit, file?: FileContent | FileContent[]): Promise<Message>;
-    editParent(content: InteractionContentEdit, file?: FileContent | FileContent[]): Promise<void>;
+    editParent(content: Omit<InteractionContentEdit, "poll">, file?: FileContent | FileContent[]): Promise<void>;
     getOriginalMessage(): Promise<Message>;
   }
 

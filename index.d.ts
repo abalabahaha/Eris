@@ -3151,6 +3151,7 @@ declare namespace Eris {
     flags: number;
     guildID: T extends GuildTextableWithThreads ? string : undefined;
     id: string;
+    /** @deprecated */
     interaction: MessageInteraction | null;
     jumpLink: string;
     member: T extends GuildTextableWithThreads ? Member : null;

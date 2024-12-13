@@ -170,6 +170,7 @@ declare namespace Eris {
   type SelectMenuNonResolvedTypes = Constants["ComponentTypes"][keyof Pick<Constants["ComponentTypes"], "STRING_SELECT">];
   type SelectMenuResolvedTypes = Constants["ComponentTypes"][keyof Pick<Constants["ComponentTypes"], "USER_SELECT" | "ROLE_SELECT" | "MENTIONABLE_SELECT" | "CHANNEL_SELECT">];
   type SelectMenuTypes = SelectMenuNonResolvedTypes | SelectMenuResolvedTypes;
+  type MessageInteractionMetadata = MessageComponentInteractionMetadata | ApplicationCommandInteractionMetadata | ModelSubmitInteractionMetadata;
 
   // Permission
   type PermissionType = Constants["PermissionOverwriteTypes"][keyof Constants["PermissionOverwriteTypes"]];
@@ -3173,6 +3174,7 @@ declare namespace Eris {
     id: string;
     /** @deprecated */
     interaction: MessageInteraction | null;
+    interactionMetadata: MessageInteractionMetadata | null;
     jumpLink: string;
     member: T extends GuildTextableWithThreads ? Member : null;
     mentionEveryone: boolean;

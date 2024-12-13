@@ -2024,9 +2024,9 @@ declare namespace Eris {
       1?: OAuthApplicationIntegrationTypeConfiguration;
     }; // TODO: Configure types for this properly
     install_params?: {
-      scopes: string[],
-      permissions: string
-    }
+      scopes: string[];
+      permissions: string;
+    };
     name: string;
     owner: PartialUser;
     privacy_policy_url?: string;

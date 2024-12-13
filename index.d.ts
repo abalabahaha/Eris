@@ -1623,15 +1623,15 @@ declare namespace Eris {
   interface ApplicationCommandInteractionMetadata extends BaseMessageMetadata {
     targetUser?: User;
     targetMessageID?: string;
-    type: Constants['InteractionTypes']['APPLICATION_COMMAND'];
+    type: Constants["InteractionTypes"]["APPLICATION_COMMAND"];
   }
   interface MessageComponentInteractionMetadata extends BaseMessageMetadata {
     interactionMessageID: string;
-    type: Constants['InteractionTypes']['MESSAGE_COMPONENT'];
+    type: Constants["InteractionTypes"]["MESSAGE_COMPONENT"];
   }
   interface ModelSubmitInteractionMetadata extends BaseMessageMetadata {
     triggeringInteractionMetadata: MessageComponentInteractionMetadata | ApplicationCommandInteractionMetadata;
-    type: Constants['InteractionTypes']['MODAL_SUBMIT'];
+    type: Constants["InteractionTypes"]["MODAL_SUBMIT"];
   }
   interface MessageReference extends MessageReferenceBase {
     channelID: string;

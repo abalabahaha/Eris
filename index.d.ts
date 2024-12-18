@@ -1622,12 +1622,12 @@ declare namespace Eris {
     user: User;
   }
   interface ApplicationCommandInteractionMetadata extends BaseMessageMetadata {
-    targetUser?: User;
     targetMessageID?: string;
+    targetUser?: User;
     type: Constants["InteractionTypes"]["APPLICATION_COMMAND"];
   }
   interface MessageComponentInteractionMetadata extends BaseMessageMetadata {
-    interactionMessageID: string;
+    interactedMessageID: string;
     type: Constants["InteractionTypes"]["MESSAGE_COMPONENT"];
   }
   interface ModelSubmitInteractionMetadata extends BaseMessageMetadata {

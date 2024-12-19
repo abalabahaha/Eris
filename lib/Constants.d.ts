@@ -22,6 +22,15 @@ export default interface Constants {
     CUSTOM:    4;
     COMPETING: 5;
   };
+  ApplicationCommandContextType: {
+    GUILD:   0;
+    BOT_DM:  1;
+    PRIVATE: 2;
+  };
+  ApplicationCommandIntegrationTypes: {
+    GUILD_INSTALL: 0;
+    USER_INSTALL:  1;
+  };
   ApplicationCommandOptionTypes: {
     SUB_COMMAND:       1;
     SUB_COMMAND_GROUP: 2;
@@ -578,11 +587,11 @@ export default interface Constants {
     sendVoiceMessages:                70368744177664n;
     setVoiceChannelStatus:            281474976710656n;
     sendPolls:                        562949953421312n;
+    allGuild:                         29697484783806n;
+    allText:                          633854226857041n;
+    allVoice:                         954930478188305n;
+    all:                              985162418487295n;
     useExternalApps:                  1125899906842624n;
-    allGuild:                         1155597391626430n;
-    allText:                          1759754133699665n;
-    allVoice:                         2080830385030929n;
-    all:                              2111062325329919n;
   };
   PollLayoutTypes: {
     DEFAULT: 1;

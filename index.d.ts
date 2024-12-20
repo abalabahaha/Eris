@@ -507,10 +507,10 @@ declare namespace Eris {
     type: ApplicationRoleConnectionMetadataTypes;
   }
   interface ClientOptions {
-    application?: { id: string; flags?: number };
     /** @deprecated */
     agent?: HTTPSAgent;
     allowedMentions?: AllowedMentions;
+    application?: { id: string; flags?: number };
     autoreconnect?: boolean;
     compress?: boolean;
     connectionTimeout?: number;

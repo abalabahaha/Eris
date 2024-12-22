@@ -49,6 +49,7 @@ export const {
   RequestHandler,
   Role,
   SKU,
+  Subscription,
   SequentialBucket,
   Shard,
   SharedStream,

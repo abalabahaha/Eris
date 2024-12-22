@@ -2652,6 +2652,7 @@ declare namespace Eris {
     currentPeriodStart: number;
 
     entitlementIDs: string[];
+    renewalSKUIDs: string[] | null;
     skuIDs: string[];
     status: SubscriptionStatuses;
     userID: string;
